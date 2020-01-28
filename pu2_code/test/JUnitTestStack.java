@@ -9,6 +9,8 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import SingleLinkedList.IStack;
+import SingleLinkedList.Stack;
 import org.junit.Test;
 
 /**
@@ -50,7 +52,7 @@ public class JUnitTestStack {
 	 *         ArrayDeque of elements
    * @throws NullPointerException if the specified ArrayDeque equals null
 	 */
-	private IStack<Object> createStackOfTestData(ArrayDeque<Object> arrayDequeOfTestData) 
+	private IStack<Object> createStackOfTestData(ArrayDeque<Object> arrayDequeOfTestData)
 			throws NullPointerException {
 
 		// Check whether parameter arrayDequeOfTestData is valid or not

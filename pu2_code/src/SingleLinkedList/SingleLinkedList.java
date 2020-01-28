@@ -1,116 +1,115 @@
 package SingleLinkedList;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+/**
+ * An implementation of the ISingleLinkedList interface using both Nodes and a backing array of nodes.
+ * @param <E>
+ * @see ISingleLinkedList
+ */
+public class SingleLinkedList<E> implements ISingleLinkedList<E>{
 
-public class SingleLinkedList<E> implements ISingleLinkedList<E> {
-
-    Node<E>[] nodes;
-    Node<E> head;
-    Node<E> tail;
-    int size;
+    private Node<E> head;
+    private Node<E> tail;
+    private int size;
 
     public SingleLinkedList(){
-        nodes = new Node[10];
         head = null;
         tail = null;
         size = 0;
     }
 
     private class Node<E> {
-        public Node(E mElement, Node mNextNode){
-            this.mElement = mElement;
-            this.mNextNode = mNextNode;
+        private E mElement;
+        private Node<E> mNextNode;
+
+        private boolean hasNext(){
+            return mNextNode != null;
         }
-        E mElement;
-        Node mNextNode;
+
+        private Node next(){
+            return this.mNextNode;
+        }
+
+        private E element(){
+            return this.mElement;
+        }
     }
+
+    private boolean isEmpty(){
+        return size == 0;
+    }
+
+    public int size(){return size;}
 
     public void add(E element){
-
-        //special case of empty list
-        if (this.size() == 0){
-            Node newNode = new Node(element, null);
-            this.head = newNode;
-            this.tail = newNode;
-            this.size++;
+        if (element == null){
+            throw new IllegalArgumentException();
         }
 
-        //special case if array is full
-        if (this.size() == nodes.length) {
-            expand();
-            Node newNode = new Node(element, null);
-            this.tail = newNode;
-            this.size++;
+        //create new node and add the element to it
+        Node newTail = new Node();
+        newTail.mElement = element;
+
+        //sort out pointers
+        if (tail != null){
+            tail.mNextNode = newTail;
+        } else {
+            tail = newTail;
+            head = newTail;
         }
-        //normal case: list is not empty, array is not full
-        else {
-            Node newNode = new Node(element, null);
-            this.tail = newNode;
-            this.size++;
+        tail = newTail;
+
+        size++;
+    }
+
+    public void add(int index, E element) throws IndexOutOfBoundsException, IllegalArgumentException {
+        if (element == null){
+            throw new IllegalArgumentException("Can't add null elements to list");
+        }
+
+        if (index < 0 || index > size){
+            throw new IndexOutOfBoundsException("Index must not be negative or larger than the size of the list");
+        }
+
+        if (size == 0){
+            add(element);
+        } else {
+            Node newNode = new Node();
+            newNode.mElement = element;
+
+            Node indexedNode = getNode(index);
+            Node tmp = indexedNode.mNextNode;
+            indexedNode.mNextNode = newNode;
+            newNode.mNextNode = tmp;
+
+            size++;
         }
     }
 
-    //double the size of the nodes-array and copy all nodes into the new array
-    private void expand() {
-        Node[] newNodes = new Node[this.nodes.length * 2];
-        for (int i = 0; i < nodes.length; i++) {
-            //break to avoid copying null nodes
-            if (nodes[i] == null){
-                break;
-            }
-            //copy nodes to new array
-            newNodes[i] = nodes[i];
+    //helper method to get the node with a certain index
+    private Node getNode(int index){
+        if (index < 0 || index > size){
+            throw new IndexOutOfBoundsException("Index must not be negative or larger than the size of the list");
         }
-        //replace the old array with the new one
-        this.nodes = newNodes;
+
+        Node current = head;
+        //move through the list to find index
+        for (int i = 0; i < index ;i++){
+            current = current.mNextNode;
+        }
+        return current;
     }
 
-    public void add(int index, E element) throws IndexOutOfBoundsException {
-
-        //special case of empty list
-        if (this.size() == 0){
-            Node newNode = new Node(element, null);
-            this.head = newNode;
-            this.tail = newNode;
-            this.size++;
-        }
-
-        //throw exception if trying to insert an element at an index position which does not exist
-        if (index >= this.size()) {
-            throw new IndexOutOfBoundsException(
-                    "Index out of bounds for index " + index +". List max index is " + (this.size() - 1) + ".");
-        }
-
-        //special case if array is full
-        if (this.size() == nodes.length) {
-            expand();
-            Node newNode = new Node(element, null);
-            this.tail = newNode;
-            this.size++;
-        }
-
-        //create a subarray of all Nodes to be moved and then move them one step to the right
-        int indexPosition = index + 1;
-        Node[] subArray = Arrays.copyOfRange(nodes, index, (nodes.length - 1));
-        int position = 0;
-        for (Node node : subArray){
-            nodes[indexPosition] = subArray[position];
-            indexPosition++;
-            position++;
-        }
-        nodes[index].mElement = element;
-        nodes[index].mNextNode = nodes[index + 1];
-        this.size++;
-    }
-
+    //todo might be enough to just set the references to null to make the GB clean out the list
     public void clear(){
-        this.size = 0;
-        this.tail = null;
-        this.head = null;
-        this.nodes = new Node[10];
+        if (!isEmpty()){
+            Node current = head;
+            while (current.hasNext()){
+                Node tmpNext = current.mNextNode;
+                current = null;
+                current = tmpNext;
+            }
+        }
+        size = 0;
     }
 
     public E get(int index) throws IndexOutOfBoundsException {
@@ -119,54 +118,56 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E> {
             throw new IndexOutOfBoundsException(
                     "Index out of bounds for index " + index +". List max index is " + (this.size() - 1) + ".");
         }
-
-        return nodes[index].mElement;
+        return (E)getNode(index).mElement;
     }
 
     public int indexOf(E element){
-        for (int i = 0; i < this.size - 1 ; i++){
-            if (nodes[i].mElement.equals(element)){
-                return i;
+        int index = 0;
+        Node current = head;
+        while (current.hasNext()){
+            if (current.mElement.equals(element)){
+                return index;
             }
+            index++;
         }
         return -1;
     }
 
     public E remove(int index) throws IndexOutOfBoundsException{
         //throw exception if trying to remove an element at an index position which does not exist
-        if (index >= this.size()) {
+        if (index >= this.size() || index < 0) {
             throw new IndexOutOfBoundsException(
                     "Index out of bounds for index " + index +". List max index is " + (this.size() - 1) + ".");
         }
         //save node element for returning
-        E tmp = (E) nodes[index].mElement;
-
-        //move all nodes and fix pointers at point of removal and end of list
-        for (int i = index; i < this.size; i++){
-            nodes[i] = nodes[i + 1];
-        }
-        nodes[index - 1].mNextNode = nodes[index];
-        nodes[this.size - 1] = null;
-        nodes[this.size - 2].mNextNode = null;
-        size--;
+        E tmp = get(index);
+        Node current = getNode(index - 1);
+        //just dropping the reference to the indexed node ought to make the GC clean it up
+        current.mNextNode = current.next().next();      //don't use getNode to avoid iterating over the nodes again
 
         return tmp;
     }
 
     public E set(int index, E element) throws IndexOutOfBoundsException{
-        E tmp = nodes[index].mElement;
-        nodes[index].mElement = element;
+        if (isEmpty() || index < 0 || index >= size){
+            throw new IndexOutOfBoundsException();
+        }
+        Node node = getNode(index);
+        E tmp = (E)node.mElement;
+        node.mElement = element;
         return tmp;
-    }
-
-    public int size(){
-        return size;
     }
 
     public E[] toArray(){
         Object[] tmp = new Object[size];
+        if (isEmpty()){
+            return null;
+        }
+
+        Node current = head;
         for (int i = 0; i < size; i++){
-            tmp[i] = nodes[i].mElement;
+            tmp[i] = current.mElement;
+            current = current.next();
         }
         //I can't seem to get rid of this cast here. Todo Think more, read more.
         return (E[])tmp;
@@ -174,12 +175,29 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E> {
 
     @Override
     public String toString(){
-        String returnString = "";
-        for (Node node : nodes){
-            returnString.concat("[" + node.mElement.toString() + "], ");
+        if (isEmpty()){
+            return "[]";
         }
+        String returnString = "[";
+
+        //concatenate all elements except the final one with the specified formatting
+        String elementString = "";
+        Node current = head;
+        elementString = elementString.concat(current.mElement.toString() + ", ");
+        while (current.hasNext()){
+            elementString = elementString.concat(current.next().mElement.toString() + ", ");
+        }
+        //handle the final element, which should not end the same way
+        elementString = elementString.concat(current.mElement.toString());
+
+        //concat
+        returnString = returnString.concat(elementString);
+        //add end bracket
+        returnString = returnString.concat("]");
+
         return returnString;
     }
+
 
 }
 

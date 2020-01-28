@@ -9,6 +9,8 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import SingleLinkedList.DoubleLinkedList;
+import SingleLinkedList.IDoubleLinkedList;
 import org.junit.Test;
 
 /**
@@ -50,7 +52,7 @@ public class JUnitTestDoubleLinkedList {
 	 *         given ArrayList of elements
    * @throws NullPointerException if the specified ArrayList equals null
    */
-	private IDoubleLinkedList<Object> createDoubleLinkedListOfTestData(ArrayList<Object> arrayOfTestData) 
+	private IDoubleLinkedList<Object> createDoubleLinkedListOfTestData(ArrayList<Object> arrayOfTestData)
 			throws NullPointerException {
 
 		// Check whether parameter arrayOfTestData is valid or not

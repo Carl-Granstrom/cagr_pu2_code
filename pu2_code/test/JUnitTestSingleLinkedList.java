@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import SingleLinkedList.ISingleLinkedList;
-import SingleLinkedList.SingleLinkedList;
+import SingleLinkedList.SingleLinkedListArray;
 import org.junit.Test;
 
 /**
@@ -61,7 +61,7 @@ public class JUnitTestSingleLinkedList {
 		}
 
 		// First create a single linked list
-		ISingleLinkedList<Object> singleLinkedListOfTestData = new SingleLinkedList<Object>();
+		ISingleLinkedList<Object> singleLinkedListOfTestData = new SingleLinkedListArray<Object>();
 		// Then add the elements from the arrayOfTestData parameter to the list
 		for (int i = 0; i < arrayOfTestData.size(); i++) {
 			singleLinkedListOfTestData.add(arrayOfTestData.get(i));
@@ -386,7 +386,7 @@ public class JUnitTestSingleLinkedList {
 			arrayOfTestData.add(7, "addedElement2");
 			sll.add(0, 42);
 			sll.add(3, "addedElement1");
-			sll.add(7, "addedElement2");			
+			sll.add(7, "addedElement2");
 		}
 		catch (Exception e) {
 			fail("testAddWithIndexesToListWith5Elements - add() method failed");
@@ -559,7 +559,7 @@ public class JUnitTestSingleLinkedList {
 			arrayOfTestData.remove(2);
 			sll.remove(0);
 			sll.remove(1);
-			sll.remove(2);			
+			sll.remove(2);
 		}
 		catch (Exception e) {
 			fail("testRemoveWithIndexesFromListWith5Elements - remove() method failed");
