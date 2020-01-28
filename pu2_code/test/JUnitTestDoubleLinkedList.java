@@ -620,7 +620,8 @@ public class JUnitTestDoubleLinkedList {
 			arrayOfTestData.remove(2);
 			dll.remove(0);
 			dll.remove(1);
-			dll.remove(2);			
+			dll.remove(2);
+
 		}
 		catch (Exception e) {
 			fail("testRemoveWithIndexesFromListWith5Elements - remove() method failed");

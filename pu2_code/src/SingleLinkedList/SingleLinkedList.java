@@ -1,15 +1,18 @@
 package SingleLinkedList;
 
 /**
- * An implementation of the ISingleLinkedList interface using both Nodes and a backing array of nodes.
+ * An implementation of the ISingleLinkedList interface using {@code Node}s.
+ *
+ * @author Carl Granström
+ * @version 2020-01-28
  * @param <E>
  * @see ISingleLinkedList
  */
 public class SingleLinkedList<E> implements ISingleLinkedList<E>{
 
-    private Node<E> head;
-    private Node<E> tail;
-    private int size;
+    protected Node<E> head;
+    protected Node<E> tail;
+    protected int size;
 
     public SingleLinkedList(){
         head = null;
@@ -17,29 +20,36 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         size = 0;
     }
 
-    private class Node<E> {
-        private E mElement;
-        private Node<E> mNextNode;
+    protected class Node<E> {
+        protected E mElement;
+        protected Node<E> mNextNode;
 
-        private boolean hasNext(){
+        protected boolean hasNext(){
             return mNextNode != null;
         }
 
-        private Node next(){
-            return this.mNextNode;
-        }
+        protected Node next(){ return this.mNextNode; }
 
-        private E element(){
+        protected E element(){
             return this.mElement;
         }
     }
 
-    private boolean isEmpty(){
+    /**
+     * Executes in constant time.
+     */
+    protected boolean isEmpty(){
         return size == 0;
     }
 
+    /**
+     * Executes in constant time.
+     */
     public int size(){return size;}
 
+    /**
+     * Executes in constant time.
+     */
     public void add(E element){
         if (element == null){
             throw new IllegalArgumentException();
@@ -61,6 +71,9 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         size++;
     }
 
+    /**
+     * O(n) worst-case, if element is added last in the list.
+     */
     public void add(int index, E element) throws IndexOutOfBoundsException, IllegalArgumentException {
         if (element == null){
             throw new IllegalArgumentException("Can't add null elements to list");
@@ -85,7 +98,10 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         }
     }
 
-    //helper method to get the node with a certain index
+    /**
+     * Helper method to get the {@code Node} of a certain index position.
+     * O(n) worst-case, if the {@code Node} is located last in the list.
+     */
     private Node getNode(int index){
         if (index < 0 || index > size){
             throw new IndexOutOfBoundsException("Index must not be negative or larger than the size of the list");
@@ -99,19 +115,21 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         return current;
     }
 
-    //todo might be enough to just set the references to null to make the GB clean out the list
     public void clear(){
         if (!isEmpty()){
             Node current = head;
             while (current.hasNext()){
                 Node tmpNext = current.mNextNode;
-                current = null;
-                current = tmpNext;
+                current = tmpNext;      //hopefully by removing all references to the old node the GC will remove them
             }
         }
         size = 0;
     }
 
+    /**
+     * O(n) worst-case, if the {@code Node} is located last in the list. This is because it uses the O(n) helper method
+     * {@code getNode()} to get the {@code Node} containing the element.
+     */
     public E get(int index) throws IndexOutOfBoundsException {
         //throw exception if trying to access an element at an index position which does not exist
         if (index >= this.size()) {
@@ -121,6 +139,9 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         return (E)getNode(index).mElement;
     }
 
+    /**
+     * O(n) worst-case, if the element is located last in the list.
+     */
     public int indexOf(E element){
         int index = 0;
         Node current = head;
@@ -133,6 +154,10 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         return -1;
     }
 
+    /**
+     * O(n) worst-case, if the element is located last in the list. This is because it uses the O(n) helper method
+     * {@code getNode()} to get the {@code Node} containing the element.
+     */
     public E remove(int index) throws IndexOutOfBoundsException{
         //throw exception if trying to remove an element at an index position which does not exist
         if (index >= this.size() || index < 0) {
@@ -144,12 +169,17 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         Node current = getNode(index - 1);
         //just dropping the reference to the indexed node ought to make the GC clean it up
         current.mNextNode = current.next().next();      //don't use getNode to avoid iterating over the nodes again
+        size--;
 
         return tmp;
     }
 
+    /**
+     * O(n) worst-case, if the element is located last in the list. This is because it uses the O(n) helper method
+     * {@code getNode()} to get the {@code Node} containing the element.
+     */
     public E set(int index, E element) throws IndexOutOfBoundsException{
-        if (isEmpty() || index < 0 || index >= size){
+        if ( (isEmpty() && index != 0) || index < 0 || index >= size){
             throw new IndexOutOfBoundsException();
         }
         Node node = getNode(index);
@@ -158,6 +188,9 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         return tmp;
     }
 
+    /**
+     * Worst- and best-case O(n), because it always needs to iterate over the whole list.
+     */
     public E[] toArray(){
         Object[] tmp = new Object[size];
         if (isEmpty()){
@@ -173,6 +206,9 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         return (E[])tmp;
     }
 
+    /**
+     * Worst- and best-case O(n), because it always needs to iterate over the whole list.
+     */
     @Override
     public String toString(){
         if (isEmpty()){
@@ -187,18 +223,14 @@ public class SingleLinkedList<E> implements ISingleLinkedList<E>{
         while (current.hasNext()){
             elementString = elementString.concat(current.next().mElement.toString() + ", ");
         }
-        //handle the final element, which should not end the same way
+        //concatenate the final element, which should not end the same way
         elementString = elementString.concat(current.mElement.toString());
 
-        //concat
-        returnString = returnString.concat(elementString);
-        //add end bracket
-        returnString = returnString.concat("]");
+        returnString = returnString.concat(elementString);  //concatenate startbracket and the elements
+        returnString = returnString.concat("]");            //add end bracket
 
         return returnString;
     }
-
-
 }
 
 
